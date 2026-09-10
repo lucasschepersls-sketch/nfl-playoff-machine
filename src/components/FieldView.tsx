@@ -6,6 +6,7 @@ import {
   winPct,
   recStr,
 } from '../engine/playoff-engine';
+import { BYE_WEEKS } from '../data/nfl-data';
 
 interface FieldViewProps {
   data: SeasonData;
@@ -171,6 +172,29 @@ export function FieldView({
             );
           })}
         </div>
+
+        {/* Bye Teams */}
+        {(() => {
+          const byeTeams = Object.entries(BYE_WEEKS)
+            .filter(([, week]) => week === currentWeek)
+            .map(([team]) => team);
+          
+          if (byeTeams.length === 0) return null;
+          
+          return (
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-xs font-semibold text-gray-600 mb-2">BYE this week:</div>
+              <div className="flex flex-wrap gap-2">
+                {byeTeams.map(team => (
+                  <div key={team} className="flex items-center gap-1.5 bg-white px-2 py-1 rounded border border-gray-200">
+                    <img src={getTeamLogo(team)} alt={team} className="w-5 h-5" />
+                    <span className="text-xs font-medium">{team}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Playoff Bracket */}
