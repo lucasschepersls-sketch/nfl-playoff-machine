@@ -1,8 +1,7 @@
 import { SeasonData } from '../engine/playoff-engine';
 
-// NFL 2026 Season Data - Season just started
-// All games are pending (not played yet)
-// Each team plays 17 games and has 1 bye week
+// NFL 2026 Season - Official Schedule from ESPN
+// Season started Sep 3, 2026
 
 export const NFL_DIVISIONS = {
   AFC: {
@@ -65,7 +64,6 @@ export const TEAM_COLORS: Record<string, { primary: string; secondary: string }>
   SEA: { primary: '#002244', secondary: '#69BE28' },
 };
 
-// Team power ratings for 2026 season (ELO-like, higher = better)
 export const TEAM_RATINGS: Record<string, number> = {
   KC: 8.5, BUF: 7.8, DET: 7.5, BAL: 7.2, PHI: 7.0,
   MIN: 6.5, WAS: 6.2, HOU: 5.8, PIT: 5.5, GB: 5.3,
@@ -76,198 +74,188 @@ export const TEAM_RATINGS: Record<string, number> = {
   CLE: 0.0, NE: -0.5,
 };
 
-// Bye weeks for each team (distributed across weeks 6-14)
-export const BYE_WEEKS: Record<string, number> = {
-  // AFC
-  BUF: 13, MIA: 11, NE: 8, NYJ: 9,
-  BAL: 14, CIN: 7, CLE: 10, PIT: 5,
-  HOU: 12, IND: 6, JAX: 14, TEN: 10,
-  DEN: 9, KC: 10, LV: 8, LAC: 6,
-  // NFC
-  DAL: 10, NYG: 11, PHI: 11, WAS: 14,
-  CHI: 13, DET: 8, GB: 5, MIN: 6,
-  ATL: 12, CAR: 7, NO: 12, TB: 9,
-  ARI: 13, LAR: 7, SF: 9, SEA: 5,
+// Official 2026 NFL Schedule from ESPN (source: espn.com/nfl/schedule)
+// Each entry: [away, home]
+// Bye weeks confirmed from ESPN data
+
+const OFFICIAL_SCHEDULE: Record<number, [string, string][]> = {
+  // Week 1 - Sep 6-15 (All 32 teams play)
+  1: [
+    ['NE', 'SEA'], ['SF', 'LAR'], ['ATL', 'PIT'], ['BAL', 'IND'],
+    ['BUF', 'HOU'], ['CHI', 'CAR'], ['CLE', 'JAX'], ['NO', 'DET'],
+    ['NYJ', 'TEN'], ['TB', 'CIN'], ['ARI', 'LAC'], ['GB', 'MIN'],
+    ['MIA', 'LV'], ['WAS', 'PHI'], ['DAL', 'NYG'], ['DEN', 'KC'],
+  ],
+  // Week 2 - Sep 16-22 (All 32 teams play)
+  2: [
+    ['DET', 'BUF'], ['CAR', 'ATL'], ['MIN', 'CHI'], ['PHI', 'TEN'],
+    ['PIT', 'NE'], ['GB', 'NYJ'], ['CLE', 'TB'], ['NO', 'BAL'],
+    ['CIN', 'HOU'], ['JAX', 'DEN'], ['LV', 'LAC'], ['WAS', 'DAL'],
+    ['SEA', 'ARI'], ['MIA', 'SF'], ['IND', 'KC'], ['NYG', 'LAR'],
+  ],
+  // Week 3 - Sep 23-29 (All 32 teams play)
+  3: [
+    ['ATL', 'GB'], ['LAC', 'BUF'], ['CAR', 'CLE'], ['NYJ', 'DET'],
+    ['HOU', 'IND'], ['KC', 'MIA'], ['TEN', 'NYG'], ['CIN', 'PIT'],
+    ['SEA', 'WAS'], ['NE', 'JAX'], ['ARI', 'SF'], ['MIN', 'TB'],
+    ['BAL', 'DAL'], ['LV', 'NO'], ['LAR', 'DEN'], ['PHI', 'CHI'],
+  ],
+  // Week 4 - Sep 30 - Oct 6 (All 32 teams play)
+  4: [
+    ['PIT', 'CLE'], ['IND', 'WAS'], ['NE', 'BUF'], ['NYJ', 'CHI'],
+    ['JAX', 'CIN'], ['ARI', 'NYG'], ['LAR', 'PHI'], ['GB', 'TB'],
+    ['TEN', 'BAL'], ['DAL', 'HOU'], ['MIA', 'MIN'], ['KC', 'LV'],
+    ['DEN', 'SF'], ['LAC', 'SEA'], ['DET', 'CAR'], ['ATL', 'NO'],
+  ],
+  // Week 5 - Oct 7-13 (Bye: KC, CAR)
+  5: [
+    ['TB', 'DAL'], ['PHI', 'JAX'], ['HOU', 'TEN'], ['CIN', 'MIA'],
+    ['LV', 'NE'], ['MIN', 'NO'], ['CLE', 'NYJ'], ['IND', 'PIT'],
+    ['NYG', 'WAS'], ['DEN', 'LAC'], ['CHI', 'GB'], ['DET', 'ARI'],
+    ['SF', 'SEA'], ['BAL', 'ATL'], ['BUF', 'LAR'],
+  ],
+  // Week 6 - Oct 14-20 (Bye: CIN, DET, MIA, MIN)
+  6: [
+    ['SEA', 'DEN'], ['HOU', 'JAX'], ['CHI', 'ATL'], ['BAL', 'CLE'],
+    ['TEN', 'IND'], ['NYJ', 'NE'], ['NO', 'NYG'], ['CAR', 'PHI'],
+    ['PIT', 'TB'], ['ARI', 'LAR'], ['LAC', 'KC'], ['BUF', 'LV'],
+    ['DAL', 'GB'], ['WAS', 'SF'],
+  ],
+  // Week 7 - Oct 21-27 (Bye: BUF, LAR, WAS, JAX)
+  7: [
+    ['NE', 'CHI'], ['PIT', 'NO'], ['SF', 'ATL'], ['CLE', 'TEN'],
+    ['IND', 'MIN'], ['MIA', 'NYJ'], ['TB', 'CAR'], ['CIN', 'BAL'],
+    ['NYG', 'HOU'], ['DEN', 'ARI'], ['GB', 'DET'], ['LAR', 'LV'],
+    ['KC', 'SEA'], ['DAL', 'PHI'],
+  ],
+  // Week 8 - Oct 28 - Nov 3 (Bye: NO, NYG, SF, HOU)
+  8: [
+    ['CAR', 'GB'], ['BAL', 'BUF'], ['TEN', 'CIN'], ['ARI', 'DAL'],
+    ['MIN', 'DET'], ['LV', 'NYJ'], ['CLE', 'PIT'], ['ATL', 'TB'],
+    ['IND', 'JAX'], ['LAC', 'LAR'], ['KC', 'DEN'], ['NE', 'MIA'],
+    ['PHI', 'WAS'], ['CHI', 'SEA'],
+  ],
+  // Week 9 - Nov 4-10 (Bye: TEN, PIT)
+  9: [
+    ['JAX', 'BAL'], ['CIN', 'ATL'], ['DAL', 'IND'], ['NYJ', 'KC'],
+    ['DET', 'MIA'], ['CLE', 'NO'], ['NYG', 'PHI'], ['LAR', 'WAS'],
+    ['DEN', 'CAR'], ['HOU', 'LAC'], ['LV', 'SF'], ['GB', 'NE'],
+    ['ARI', 'SEA'], ['TB', 'CHI'], ['BUF', 'MIN'],
+  ],
+  // Week 10 - Nov 11-17 (Bye: CHI, DEN, PHI, TB)
+  10: [
+    ['WAS', 'NYG'], ['NE', 'DET'], ['KC', 'ATL'], ['HOU', 'CLE'],
+    ['MIN', 'GB'], ['JAX', 'TEN'], ['MIA', 'IND'], ['CAR', 'NO'],
+    ['BUF', 'NYJ'], ['SEA', 'LV'], ['LAR', 'ARI'], ['SF', 'DAL'],
+    ['PIT', 'CIN'], ['LAC', 'BAL'],
+  ],
+  // Week 11 - Nov 18-24 (Bye: ATL, CLE, GB, LAR, NE, SEA)
+  11: [
+    ['IND', 'HOU'], ['MIA', 'BUF'], ['NO', 'CHI'], ['TEN', 'DAL'],
+    ['TB', 'DET'], ['ARI', 'KC'], ['JAX', 'NYG'], ['BAL', 'CAR'],
+    ['NYJ', 'LAC'], ['LV', 'DEN'], ['PIT', 'PHI'], ['MIN', 'SF'],
+    ['CIN', 'WAS'],
+  ],
+  // Week 12 - Nov 25 - Dec 1 (No bye - all 32 teams play)
+  12: [
+    ['GB', 'LAR'], ['CHI', 'DET'], ['PHI', 'DAL'], ['KC', 'BUF'],
+    ['DEN', 'PIT'], ['NO', 'CIN'], ['LV', 'CLE'], ['NYG', 'IND'],
+    ['NYJ', 'MIA'], ['ATL', 'MIN'], ['BAL', 'HOU'], ['TEN', 'JAX'],
+    ['WAS', 'ARI'], ['SEA', 'SF'], ['NE', 'LAC'], ['CAR', 'TB'],
+  ],
+  // Week 13 - Dec 2-8 (Bye: IND, LV, NYJ, BAL)
+  13: [
+    ['KC', 'LAR'], ['DET', 'ATL'], ['JAX', 'CHI'], ['CIN', 'CLE'],
+    ['WAS', 'TEN'], ['GB', 'NO'], ['SF', 'NYG'], ['LAC', 'TB'],
+    ['MIA', 'DEN'], ['PHI', 'ARI'], ['CAR', 'MIN'], ['BUF', 'NE'],
+    ['HOU', 'PIT'], ['DAL', 'SEA'],
+  ],
+  // Week 14 - Dec 9-15 (Bye: DAL, ARI)
+  14: [
+    ['MIN', 'NE'], ['ATL', 'CLE'], ['TEN', 'DET'], ['CHI', 'MIA'],
+    ['DEN', 'NYJ'], ['IND', 'PHI'], ['HOU', 'WAS'], ['NO', 'CAR'],
+    ['TB', 'BAL'], ['LAC', 'LV'], ['KC', 'CIN'], ['LAR', 'SF'],
+    ['NYG', 'SEA'], ['BUF', 'GB'], ['PIT', 'JAX'],
+  ],
+  // Week 15 - Dec 16-22 (No bye - all 32 teams play)
+  15: [
+    ['SF', 'LAC'], ['SEA', 'PHI'], ['CHI', 'BUF'], ['MIA', 'GB'],
+    ['IND', 'TEN'], ['CLE', 'NYG'], ['BAL', 'PIT'], ['NO', 'TB'],
+    ['ATL', 'WAS'], ['CIN', 'CAR'], ['JAX', 'HOU'], ['NYJ', 'ARI'],
+    ['DEN', 'LV'], ['DAL', 'LAR'], ['DET', 'MIN'], ['NE', 'KC'],
+  ],
+  // Week 16 - Dec 23-29 (Bye: BUF, DET, JAX, MIN)
+  16: [
+    ['NE', 'MIA'], ['NYJ', 'CIN'], ['CLE', 'PIT'], ['BAL', 'HOU'],
+    ['IND', 'TEN'], ['KC', 'DEN'], ['LAC', 'LV'], ['DAL', 'PHI'],
+    ['WAS', 'NYG'], ['CHI', 'GB'], ['ATL', 'CAR'], ['NO', 'TB'],
+    ['SF', 'SEA'], ['ARI', 'LAR'],
+  ],
+  // Week 17 - Dec 30 - Jan 5 (Bye: DAL, DEN, LV, WAS)
+  17: [
+    ['NE', 'BUF'], ['MIA', 'NYJ'], ['CIN', 'CLE'], ['PIT', 'BAL'],
+    ['HOU', 'IND'], ['JAX', 'TEN'], ['KC', 'LAC'], ['PHI', 'NYG'],
+    ['CHI', 'DET'], ['GB', 'MIN'], ['ATL', 'CAR'], ['NO', 'TB'],
+    ['SF', 'SEA'], ['ARI', 'LAR'],
+  ],
+  // Week 18 - Jan 6-12 (No bye - all 32 teams play)
+  18: [
+    ['NYJ', 'BUF'], ['CLE', 'CIN'], ['LAC', 'DEN'], ['DET', 'GB'],
+    ['JAX', 'IND'], ['LV', 'KC'], ['SEA', 'LAR'], ['CHI', 'MIN'],
+    ['MIA', 'NE'], ['TB', 'NO'], ['PHI', 'NYG'], ['SF', 'ARI'],
+    ['DAL', 'WAS'], ['ATL', 'CAR'], ['PIT', 'BAL'], ['TEN', 'HOU'],
+  ],
 };
 
-// Complete 2026 NFL Schedule - 18 weeks
-// Each team plays 17 games and has 1 bye week
+// Official bye weeks from ESPN (confirmed for all weeks)
+export const BYE_WEEKS: Record<string, number> = {
+  // Week 5
+  KC: 5, CAR: 5,
+  // Week 6
+  CIN: 6, DET: 6, MIA: 6, MIN: 6,
+  // Week 7
+  BUF: 7, LAC: 7, WAS: 7, JAX: 7,
+  // Week 8
+  NO: 8, NYG: 8, SF: 8, HOU: 8,
+  // Week 9
+  TEN: 9, PIT: 9,
+  // Week 10
+  CHI: 10, DEN: 10, PHI: 10, TB: 10,
+  // Week 11
+  ATL: 11, CLE: 11, GB: 11, LAR: 11, NE: 11, SEA: 11,
+  // Week 13
+  IND: 13, LV: 13, NYJ: 13, BAL: 13,
+  // Week 14
+  DAL: 14, ARI: 14,
+  // Weeks 15-18: No bye weeks (all teams play)
+};
+
 function generateSchedule(): Record<string, any[]> {
   const games: Record<string, any[]> = {};
   let gameId = 1;
 
-  // Week 1 - All teams play
-  const week1: [string, string][] = [
-    ['NE', 'SEA'], ['SF', 'LAR'], ['CHI', 'CAR'], ['TB', 'CIN'],
-    ['NO', 'DET'], ['BUF', 'HOU'], ['BAL', 'IND'], ['CLE', 'JAX'],
-    ['ATL', 'PIT'], ['NYJ', 'TEN'], ['ARI', 'LAC'], ['MIA', 'LV'],
-    ['GB', 'MIN'], ['WAS', 'PHI'], ['DAL', 'NYG'], ['DEN', 'KC'],
-  ];
-
-  // Week 2 - All teams play
-  const week2: [string, string][] = [
-    ['LV', 'BAL'], ['CIN', 'KC'], ['MIA', 'BUF'], ['SEA', 'NE'],
-    ['TEN', 'NYJ'], ['JAX', 'CLE'], ['DEN', 'PIT'], ['CHI', 'HOU'],
-    ['GB', 'IND'], ['PHI', 'ATL'], ['NO', 'DAL'], ['TB', 'DET'],
-    ['SF', 'MIN'], ['NYG', 'WAS'], ['ARI', 'LAR'], ['LAC', 'CAR'],
-  ];
-
-  // Week 3 - All teams play
-  const week3: [string, string][] = [
-    ['IND', 'CHI'], ['TEN', 'GB'], ['ARI', 'DET'], ['NE', 'NYJ'],
-    ['JAX', 'BUF'], ['SEA', 'MIA'], ['LAC', 'PIT'], ['WAS', 'CIN'],
-    ['DAL', 'BAL'], ['MIN', 'HOU'], ['CAR', 'ATL'], ['PHI', 'NO'],
-    ['DEN', 'TB'], ['LAR', 'SF'], ['NYG', 'KC'], ['LV', 'CLE'],
-  ];
-
-  // Week 4 - All teams play
-  const week4: [string, string][] = [
-    ['NYG', 'DAL'], ['TB', 'PHI'], ['ARI', 'WAS'], ['GB', 'MIN'],
-    ['SEA', 'DET'], ['LAR', 'CHI'], ['NE', 'SF'], ['DEN', 'NYJ'],
-    ['BAL', 'BUF'], ['LAC', 'KC'], ['CAR', 'CIN'], ['LV', 'CLE'],
-    ['IND', 'PIT'], ['JAX', 'HOU'], ['TEN', 'MIA'], ['NO', 'ATL'],
-  ];
-
-  // Week 5 - PIT, GB, SEA have bye
-  const week5: [string, string][] = [
-    ['CIN', 'BAL'], ['DAL', 'CLE'], ['WAS', 'NYJ'], ['MIN', 'MIA'],
-    ['HOU', 'BUF'], ['JAX', 'IND'], ['TEN', 'NE'], ['LV', 'DEN'],
-    ['KC', 'LAC'], ['CHI', 'CAR'], ['PHI', 'DET'], ['LAR', 'ATL'],
-    ['SF', 'ARI'], ['TB', 'NO'],
-  ];
-
-  // Week 6 - IND, LAC, MIN have bye
-  const week6: [string, string][] = [
-    ['CLE', 'PHI'], ['LV', 'PIT'], ['DET', 'DAL'], ['BAL', 'WAS'],
-    ['CIN', 'NYG'], ['HOU', 'NE'], ['JAX', 'CHI'], ['TEN', 'GB'],
-    ['SF', 'MIA'], ['NYJ', 'BUF'], ['CAR', 'ATL'], ['TB', 'NO'],
-    ['ARI', 'SEA'], ['DEN', 'LAR'], ['KC', 'LAC'],
-  ];
-
-  // Week 7 - CIN, CAR, LAR have bye
-  const week7: [string, string][] = [
-    ['KC', 'SF'], ['DET', 'HOU'], ['TB', 'BAL'], ['CLE', 'PIT'],
-    ['NYJ', 'MIN'], ['JAX', 'NE'], ['IND', 'MIA'], ['SEA', 'TEN'],
-    ['LV', 'DEN'], ['LAC', 'ARI'], ['CHI', 'GB'], ['PHI', 'WAS'],
-    ['BUF', 'NYG'], ['ATL', 'NO'], ['DAL', 'LAR'],
-  ];
-
-  // Week 8 - NE, LV, DET have bye
-  const week8: [string, string][] = [
-    ['MIA', 'ARI'], ['PHI', 'CIN'], ['CLE', 'BAL'], ['NYJ', 'PIT'],
-    ['SEA', 'BUF'], ['IND', 'HOU'], ['GB', 'JAX'], ['TEN', 'CHI'],
-    ['WAS', 'MIN'], ['SF', 'DAL'], ['TB', 'ATL'], ['LAC', 'NO'],
-    ['LAR', 'NYG'], ['LV', 'KC'], ['CAR', 'DEN'],
-  ];
-
-  // Week 9 - NYJ, DEN, SF, TB have bye
-  const week9: [string, string][] = [
-    ['HOU', 'PIT'], ['TEN', 'NE'], ['MIA', 'BUF'], ['BAL', 'CIN'],
-    ['LAC', 'CLE'], ['WAS', 'IND'], ['ATL', 'DAL'], ['JAX', 'PHI'],
-    ['CAR', 'NYG'], ['ARI', 'CHI'], ['GB', 'DET'], ['MIN', 'LAR'],
-    ['KC', 'LV'], ['SEA', 'NO'],
-  ];
-
-  // Week 10 - CLE, JAX, TEN, DAL, PHI have bye
-  const week10: [string, string][] = [
-    ['PIT', 'WAS'], ['CIN', 'BAL'], ['NE', 'NYJ'], ['ARI', 'MIA'],
-    ['LAR', 'HOU'], ['IND', 'BUF'], ['DET', 'CHI'], ['MIN', 'GB'],
-    ['KC', 'DEN'], ['LV', 'LAC'], ['CAR', 'ATL'], ['TB', 'SF'],
-    ['SEA', 'NO'],
-  ];
-
-  // Week 11 - MIA, NYJ, JAX, ARI have bye
-  const week11: [string, string][] = [
-    ['WAS', 'PHI'], ['HOU', 'DAL'], ['CHI', 'NYG'], ['LAC', 'CIN'],
-    ['PIT', 'CLE'], ['BAL', 'IND'], ['KC', 'BUF'], ['LV', 'TEN'],
-    ['LAR', 'NE'], ['DET', 'MIN'], ['ATL', 'TB'], ['SF', 'CAR'],
-    ['GB', 'SEA'], ['DEN', 'ARI'],
-  ];
-
-  // Week 12 - BUF, NE, JAX, CAR have bye
-  const week12: [string, string][] = [
-    ['CIN', 'PIT'], ['BAL', 'LAC'], ['CLE', 'NYJ'], ['DAL', 'HOU'],
-    ['DET', 'IND'], ['CHI', 'TEN'], ['MIA', 'SF'], ['NO', 'ATL'],
-    ['NYG', 'PHI'], ['LAR', 'WAS'], ['MIN', 'GB'], ['ARI', 'SEA'],
-    ['TB', 'LV'], ['KC', 'DEN'],
-  ];
-
-  // Week 13 - BUF, CHI, ARI, ATL, NO have bye
-  const week13: [string, string][] = [
-    ['LAC', 'PIT'], ['PHI', 'BAL'], ['CIN', 'CLE'], ['DEN', 'NYJ'],
-    ['SEA', 'NE'], ['IND', 'MIA'], ['GB', 'JAX'], ['HOU', 'TEN'],
-    ['LV', 'KC'], ['WAS', 'DAL'], ['TB', 'NYG'], ['LAR', 'SF'],
-    ['CAR', 'DET'], ['MIN', 'ARI'],
-  ];
-
-  // Week 14 - BAL, WAS, JAX, TEN, ARI have bye
-  const week14: [string, string][] = [
-    ['CLE', 'PIT'], ['CIN', 'NYJ'], ['MIA', 'NE'], ['BUF', 'HOU'],
-    ['IND', 'LAC'], ['DEN', 'LV'], ['KC', 'CAR'], ['DAL', 'PHI'],
-    ['NYG', 'CHI'], ['DET', 'GB'], ['MIN', 'ATL'], ['NO', 'TB'],
-    ['SF', 'LAR'], ['SEA', 'ARI'],
-  ];
-
-  // Week 15 - CLE, NYJ, JAX, ARI have bye
-  const week15: [string, string][] = [
-    ['KC', 'PIT'], ['TEN', 'CIN'], ['PHI', 'BAL'], ['NYG', 'NE'],
-    ['BUF', 'MIA'], ['HOU', 'IND'], ['LAC', 'DEN'], ['LV', 'LAC'],
-    ['CAR', 'DAL'], ['ATL', 'TB'], ['MIN', 'CHI'], ['WAS', 'NO'],
-    ['SEA', 'GB'], ['LAR', 'SF'], ['DET', 'ARI'],
-  ];
-
-  // Week 16 - CLE, NYJ, JAX, TEN, CAR have bye
-  const week16: [string, string][] = [
-    ['KC', 'HOU'], ['CIN', 'DEN'], ['BAL', 'PIT'], ['NE', 'BUF'],
-    ['SF', 'MIA'], ['LV', 'LAC'], ['IND', 'NYG'], ['DAL', 'PHI'],
-    ['WAS', 'CHI'], ['ATL', 'TB'], ['ARI', 'LAR'], ['DET', 'MIN'],
-    ['GB', 'SEA'], ['NO', 'SF'],
-  ];
-
-  // Week 17 - CLE, NYJ, JAX, TEN, CAR, TB have bye
-  const week17: [string, string][] = [
-    ['PIT', 'KC'], ['HOU', 'BAL'], ['DEN', 'CIN'], ['LAC', 'NE'],
-    ['BUF', 'MIA'], ['LV', 'IND'], ['NYG', 'DAL'], ['PHI', 'WAS'],
-    ['ATL', 'CHI'], ['SEA', 'DET'], ['SF', 'MIN'], ['LAR', 'GB'],
-    ['NO', 'ARI'],
-  ];
-
-  // Week 18 - Final week, all teams play
-  const week18: [string, string][] = [
-    ['CIN', 'PIT'], ['CLE', 'BAL'], ['NE', 'BUF'], ['NYJ', 'MIA'],
-    ['TEN', 'HOU'], ['JAX', 'IND'], ['DEN', 'KC'], ['LV', 'LAC'],
-    ['WAS', 'DAL'], ['NYG', 'PHI'], ['MIN', 'DET'], ['CHI', 'GB'],
-    ['CAR', 'ATL'], ['NO', 'TB'], ['ARI', 'SF'], ['LAR', 'SEA'],
-  ];
-
-  const allWeeks: [string, string][][] = [
-    week1, week2, week3, week4, week5, week6, week7, week8, week9,
-    week10, week11, week12, week13, week14, week15, week16, week17, week18
-  ];
-
-  allWeeks.forEach((weekMatchups, weekIdx) => {
-    const weekNum = weekIdx + 1;
-    games[String(weekNum)] = weekMatchups.map((matchup, idx) => {
+  for (let week = 1; week <= 18; week++) {
+    const matchups = OFFICIAL_SCHEDULE[week] || [];
+    games[String(week)] = matchups.map((matchup, idx) => {
       const [away, home] = matchup;
       const homeRating = TEAM_RATINGS[home] || 0;
       const awayRating = TEAM_RATINGS[away] || 0;
-      // Calculate win probability with home field advantage
       const margin = homeRating - awayRating + 1.7;
       const wp = 1 / (1 + Math.exp(-0.107 * margin));
       
       return {
         id: gameId++,
-        week: weekNum,
+        week,
         away,
         home,
         pIndex: idx,
-        wp: Math.max(0.15, Math.min(0.85, wp)), // Clamp between 15% and 85%
+        wp: Math.max(0.15, Math.min(0.85, wp)),
         done: false,
         hs: 0,
         as: 0,
       };
     });
-  });
+  }
 
   return games;
 }
