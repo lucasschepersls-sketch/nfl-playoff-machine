@@ -167,7 +167,7 @@ function App() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold">NFL Playoff Predictor</h1>
-              <p className="text-xs text-gray-500">The Playoff Machine · Week {currentWeek}, 2024 season</p>
+              <p className="text-xs text-gray-500">The Playoff Machine · Week {currentWeek}, 2026 season</p>
             </div>
             <div className="flex gap-2">
               <button

@@ -1,6 +1,6 @@
-# NFL Playoff Machine
+# NFL Playoff Machine 2026
 
-Uma máquina de playoffs da NFL interativa inspirada no [sticktothemodel.com](https://sticktothemodel.com/playoff-machine), construída com React, TypeScript e Tailwind CSS.
+Uma máquina de playoffs da NFL interativa para a temporada 2026-2027, inspirada no [sticktothemodel.com](https://sticktothemodel.com/playoff-machine), construída com React, TypeScript e Tailwind CSS.
 
 ## 🏈 Funcionalidades
 
@@ -72,7 +72,7 @@ Motor TypeScript completo que implementa:
 - Nomes e cores dos times
 - Logotipos (via ESPN CDN)
 - Ratings de poder dos times
-- Schedule da temporada 2024
+- Schedule da temporada 2026-2027
 
 ### Componentes
 - **FieldView**: Interface principal com seleção de jogos e bracket

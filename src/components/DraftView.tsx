@@ -22,7 +22,7 @@ export function DraftView({
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-bold mb-2">2025 NFL Draft order</h3>
+      <h3 className="text-lg font-bold mb-2">2027 NFL Draft order</h3>
       <p className="text-sm text-gray-600 mb-6">
         Your picks set this too — every result moves the top of the draft.
       </p>

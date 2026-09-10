@@ -176,7 +176,7 @@ export function FieldView({
       {/* Playoff Bracket */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <h3 className="text-sm font-semibold mb-4">
-          🏆 2024 NFL Playoff Bracket · Super Bowl, February 2025
+          🏆 2026 NFL Playoff Bracket · Super Bowl, February 2027
           <span className="text-xs text-gray-500 ml-2 block mt-1">
             Tap any team to call their game — tap again to hand it back to the model. Numbers are win odds.
           </span>
@@ -419,7 +419,7 @@ function SuperBowlGame({
   return (
     <div className="border-2 border-yellow-400 rounded-lg p-4 bg-gradient-to-b from-yellow-50 to-yellow-100 shadow-lg">
       <h4 className="text-xs font-bold text-gray-700 text-center mb-3 uppercase tracking-wider">
-        🏆 Super Bowl LIX
+        🏆 Super Bowl LXI
       </h4>
       <div className="space-y-2">
         <button
