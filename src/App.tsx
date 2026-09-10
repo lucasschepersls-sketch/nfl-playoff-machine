@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   computeStandings,
   seedConference,
@@ -62,6 +62,8 @@ function App() {
   const [selectedTeam, setSelectedTeam] = useState<string>('');
   const [currentWeek, setCurrentWeek] = useState(1);
   const [mcResults, setMcResults] = useState<Record<string, MonteCarloResult> | null>(null);
+  const [darkMode, setDarkMode] = useState(true);
+  const [mcRunning, setMcRunning] = useState(false);
 
   const standings = useMemo<StandingsResult>(() => computeStandings(data, picks), [data, picks]);
   const afcSeeds = useMemo<SeedEntry[]>(() => seedConference(standings, data, 'AFC'), [standings, data]);
@@ -70,6 +72,17 @@ function App() {
     resolvePostseason(afcSeeds, nfcSeeds, playoffPicks, data.ratings || {}),
     [afcSeeds, nfcSeeds, playoffPicks, data.ratings]
   );
+
+  // Auto-run Monte Carlo simulation when picks change (debounced)
+  useEffect(() => {
+    setMcRunning(true);
+    const timer = setTimeout(() => {
+      const results = runMonteCarlo(data, picks, 500);
+      setMcResults(results);
+      setMcRunning(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [data, picks]);
 
   const handleGamePick = useCallback((gameId: number, side: 'h' | 'a') => {
     setPicks(prev => ({ ...prev, [gameId]: side }));
@@ -160,19 +173,39 @@ function App() {
   }, [data, currentWeek]);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b sticky top-0 z-50`}>
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold">NFL Playoff Predictor</h1>
-              <p className="text-xs text-gray-500">The Playoff Machine · Week {currentWeek}, 2026 season</p>
+              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>The Playoff Machine · Week {currentWeek}, 2026 season</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              {mcRunning && (
+                <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} animate-pulse`}>
+                  ⏳ Updating odds...
+                </span>
+              )}
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                  darkMode 
+                    ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {darkMode ? '☀️' : '🌙'}
+              </button>
               <button
                 onClick={() => navigator.clipboard.writeText(window.location.href)}
-                className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                  darkMode 
+                    ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
               >
                 Share
               </button>
@@ -182,15 +215,17 @@ function App() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-200">
+      <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-6">
             <button
               onClick={() => setActiveTab('field')}
               className={`py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'field'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-blue-500 text-blue-400'
+                  : darkMode
+                    ? 'border-transparent text-gray-400 hover:text-gray-200'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
               The field
@@ -199,8 +234,10 @@ function App() {
               onClick={() => setActiveTab('team')}
               className={`py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'team'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-blue-500 text-blue-400'
+                  : darkMode
+                    ? 'border-transparent text-gray-400 hover:text-gray-200'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
               Your team
@@ -209,8 +246,10 @@ function App() {
               onClick={() => setActiveTab('draft')}
               className={`py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'draft'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-blue-500 text-blue-400'
+                  : darkMode
+                    ? 'border-transparent text-gray-400 hover:text-gray-200'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
               Draft order
@@ -241,6 +280,7 @@ function App() {
             resetPicks={resetPicks}
             getTeamName={getTeamName}
             getTeamLogo={getTeamLogo}
+            darkMode={darkMode}
           />
         )}
         {activeTab === 'team' && (
@@ -251,10 +291,12 @@ function App() {
             selectedTeam={selectedTeam}
             setSelectedTeam={setSelectedTeam}
             mcResults={mcResults}
+            mcRunning={mcRunning}
             runMonteCarloSim={runMonteCarloSim}
             onGamePick={handleGamePick}
             getTeamName={getTeamName}
             getTeamLogo={getTeamLogo}
+            darkMode={darkMode}
           />
         )}
         {activeTab === 'draft' && (
@@ -263,6 +305,7 @@ function App() {
             postseason={postseason}
             getTeamName={getTeamName}
             getTeamLogo={getTeamLogo}
+            darkMode={darkMode}
           />
         )}
       </main>
