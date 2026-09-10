@@ -10,6 +10,7 @@ interface DraftViewProps {
   postseason: PostseasonResult;
   getTeamName: (t: string) => string;
   getTeamLogo: (t: string) => string;
+  darkMode: boolean;
 }
 
 export function DraftView({
@@ -17,13 +18,20 @@ export function DraftView({
   postseason,
   getTeamName,
   getTeamLogo,
+  darkMode,
 }: DraftViewProps) {
   const draftOrder = computeDraftOrder(standings, postseason.eliminations);
+  const bg = darkMode ? 'bg-gray-800' : 'bg-white';
+  const border = darkMode ? 'border-gray-700' : 'border-gray-200';
+  const text = darkMode ? 'text-gray-100' : 'text-gray-900';
+  const textMuted = darkMode ? 'text-gray-400' : 'text-gray-500';
+  const textSub = darkMode ? 'text-gray-300' : 'text-gray-600';
+  const gameBg = darkMode ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50';
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-bold mb-2">2027 NFL Draft order</h3>
-      <p className="text-sm text-gray-600 mb-6">
+    <div className={`${bg} rounded-lg border ${border} p-6`}>
+      <h3 className={`text-lg font-bold mb-2 ${text}`}>2027 NFL Draft order</h3>
+      <p className={`text-sm mb-6 ${textMuted}`}>
         Your picks set this too — every result moves the top of the draft.
       </p>
 
@@ -45,25 +53,21 @@ export function DraftView({
           return (
             <div
               key={team}
-              className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                idx < 10
-                  ? 'hover:bg-gray-50'
-                  : 'hover:bg-gray-50'
-              }`}
+              className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${gameBg}`}
             >
               <div className="w-10 text-center">
-                <span className={`text-lg font-bold ${idx < 10 ? 'text-gray-700' : 'text-gray-400'}`}>
+                <span className={`text-lg font-bold ${idx < 10 ? (darkMode ? 'text-gray-200' : 'text-gray-700') : textMuted}`}>
                   {idx + 1}
                 </span>
               </div>
               <img src={getTeamLogo(team)} alt={team} className="w-10 h-10" />
               <div className="flex-1">
-                <div className="font-bold text-base">{team}</div>
-                <div className="text-xs text-gray-500">
+                <div className={`font-bold text-base ${text}`}>{team}</div>
+                <div className={`text-xs ${textMuted}`}>
                   {getTeamName(team)}
                 </div>
               </div>
-              <div className="text-sm text-gray-600 font-mono">
+              <div className={`text-sm font-mono ${textSub}`}>
                 range {range}
               </div>
             </div>
