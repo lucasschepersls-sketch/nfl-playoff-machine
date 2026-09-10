@@ -4,6 +4,9 @@ import {
   type SeedEntry,
   type PostseasonResult,
   winPct,
+  divPct,
+  confPct,
+  netPoints,
   recStr,
 } from '../engine/playoff-engine';
 import { BYE_WEEKS } from '../data/nfl-data';
@@ -281,24 +284,50 @@ export function FieldView({
         <h3 className={`text-sm font-semibold mb-4 ${text}`}>Division standings</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {(['AFC', 'NFC'] as const).map(conf =>
-            Object.entries(data.divisions[conf]).map(([divName, teams]) => (
-              <div key={`${conf}-${divName}`}>
-                <h4 className={`text-xs font-bold mb-3 uppercase tracking-wide ${textSub}`}>{conf} {divName}</h4>
-                <div className="space-y-2">
-                  {(teams as string[]).map((team: string) => {
-                    const rec = standings.recs[team];
-                    return (
-                      <div key={team} className={`flex items-center gap-3 p-2 rounded transition-colors ${gameBg}`}>
-                        <img src={getTeamLogo(team)} alt={team} className="w-8 h-8" />
-                        <span className={`font-bold text-sm w-10 ${text}`}>{team}</span>
+            Object.entries(data.divisions[conf]).map(([divName, teams]) => {
+              // Ordenar times usando tiebreakers oficiais da NFL
+              const sortedTeams = (teams as string[])
+                .map(t => standings.recs[t])
+                .sort((a, b) => {
+                  // Primeiro: winPct
+                  const wpDiff = winPct(b) - winPct(a);
+                  if (Math.abs(wpDiff) > 0.001) return wpDiff;
+                  
+                  // Tiebreaker 1: Head-to-head
+                  const aH2H = a.h2hW[b.team] || 0;
+                  const bH2H = b.h2hW[a.team] || 0;
+                  const totalH2H = aH2H + bH2H;
+                  if (totalH2H > 0 && aH2H !== bH2H) return bH2H - aH2H;
+                  
+                  // Tiebreaker 2: Division record
+                  const divDiff = divPct(b) - divPct(a);
+                  if (Math.abs(divDiff) > 0.001) return divDiff;
+                  
+                  // Tiebreaker 3: Conference record
+                  const confDiff = confPct(b) - confPct(a);
+                  if (Math.abs(confDiff) > 0.001) return confDiff;
+                  
+                  // Tiebreaker 4: Net points
+                  return netPoints(b) - netPoints(a);
+                });
+              
+              return (
+                <div key={`${conf}-${divName}`}>
+                  <h4 className={`text-xs font-bold mb-3 uppercase tracking-wide ${textSub}`}>{conf} {divName}</h4>
+                  <div className="space-y-2">
+                    {sortedTeams.map((rec, idx) => (
+                      <div key={rec.team} className={`flex items-center gap-3 p-2 rounded transition-colors ${gameBg}`}>
+                        <span className={`text-xs font-bold w-4 ${textMuted}`}>{idx + 1}</span>
+                        <img src={getTeamLogo(rec.team)} alt={rec.team} className="w-8 h-8" />
+                        <span className={`font-bold text-sm w-10 ${text}`}>{rec.team}</span>
                         <span className={`font-mono text-sm flex-1 ${textSub}`}>{recStr(rec)}</span>
                         <span className={`text-xs font-mono ${textMuted}`}>({rec.dw}-{rec.dl})</span>
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
