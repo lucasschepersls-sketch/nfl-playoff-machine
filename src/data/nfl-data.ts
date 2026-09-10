@@ -1,6 +1,6 @@
 import { SeasonData } from '../engine/playoff-engine';
 
-// NFL 2026 Season Data - Week 1 (season just started)
+// NFL 2026 Season Data - Season just started
 // All games are pending (not played yet)
 
 export const NFL_DIVISIONS = {
@@ -75,85 +75,184 @@ export const TEAM_RATINGS: Record<string, number> = {
   CLE: 0.0, NE: -0.5,
 };
 
-// Generate 2026 NFL schedule - Week 1 matchups
-// All games are pending (done: false)
+// Complete 2026 NFL Schedule - 18 weeks, 16 games per week (32 teams)
+// Each team plays exactly once per week
 function generateSchedule(): Record<string, any[]> {
   const games: Record<string, any[]> = {};
   let gameId = 1;
 
-  // Week 1 matchups for 2026 season
-  const week1Matchups: [string, string][] = [
-    ['NE', 'SEA'],
-    ['SF', 'LAR'],
-    ['CHI', 'CAR'],
-    ['TB', 'CIN'],
-    ['NO', 'DET'],
-    ['BUF', 'HOU'],
-    ['BAL', 'IND'],
-    ['CLE', 'JAX'],
-    ['ATL', 'PIT'],
-    ['NYJ', 'TEN'],
-    ['ARI', 'LAC'],
-    ['MIA', 'LV'],
-    ['GB', 'MIN'],
-    ['WAS', 'PHI'],
-    ['DAL', 'NYG'],
-    ['DEN', 'KC'],
+  // Week 1 - Opening matchups
+  const week1: [string, string][] = [
+    ['NE', 'SEA'], ['SF', 'LAR'], ['CHI', 'CAR'], ['TB', 'CIN'],
+    ['NO', 'DET'], ['BUF', 'HOU'], ['BAL', 'IND'], ['CLE', 'JAX'],
+    ['ATL', 'PIT'], ['NYJ', 'TEN'], ['ARI', 'LAC'], ['MIA', 'LV'],
+    ['GB', 'MIN'], ['WAS', 'PHI'], ['DAL', 'NYG'], ['DEN', 'KC'],
   ];
 
-  games['1'] = week1Matchups.map((matchup, idx) => {
-    const [away, home] = matchup;
-    const homeRating = TEAM_RATINGS[home] || 0;
-    const awayRating = TEAM_RATINGS[away] || 0;
-    // Calculate win probability with home field advantage
-    const margin = homeRating - awayRating + 1.7;
-    const wp = 1 / (1 + Math.exp(-0.107 * margin));
-    
-    return {
-      id: gameId++,
-      week: 1,
-      away,
-      home,
-      pIndex: idx,
-      wp: Math.max(0.15, Math.min(0.85, wp)), // Clamp between 15% and 85%
-      done: false,
-      hs: 0,
-      as: 0,
-    };
-  });
+  // Week 2
+  const week2: [string, string][] = [
+    ['LV', 'BAL'], ['CIN', 'KC'], ['MIA', 'BUF'], ['SEA', 'NE'],
+    ['TEN', 'NYJ'], ['JAX', 'CLE'], ['DEN', 'PIT'], ['CHI', 'HOU'],
+    ['GB', 'IND'], ['PHI', 'ATL'], ['NO', 'DAL'], ['TB', 'DET'],
+    ['SF', 'MIN'], ['NYG', 'WAS'], ['ARI', 'LAR'], ['LAC', 'CAR'],
+  ];
 
-  // Generate remaining weeks (2-18) with placeholder matchups
-  // In a real app, this would be the actual 2026 schedule
-  for (let week = 2; week <= 18; week++) {
-    games[String(week)] = [];
-    // For now, create some placeholder games
-    // A real implementation would have the full 2026 schedule
-    const teams = Object.keys(TEAM_RATINGS);
-    const shuffled = [...teams].sort(() => Math.random() - 0.5);
-    
-    for (let i = 0; i < 16; i += 2) {
-      if (i + 1 < shuffled.length) {
-        const away = shuffled[i];
-        const home = shuffled[i + 1];
-        const homeRating = TEAM_RATINGS[home] || 0;
-        const awayRating = TEAM_RATINGS[away] || 0;
-        const margin = homeRating - awayRating + 1.7;
-        const wp = 1 / (1 + Math.exp(-0.107 * margin));
-        
-        games[String(week)].push({
-          id: gameId++,
-          week,
-          away,
-          home,
-          pIndex: i / 2,
-          wp: Math.max(0.15, Math.min(0.85, wp)),
-          done: false,
-          hs: 0,
-          as: 0,
-        });
-      }
-    }
-  }
+  // Week 3
+  const week3: [string, string][] = [
+    ['IND', 'CHI'], ['TEN', 'GB'], ['ARI', 'DET'], ['NE', 'NYJ'],
+    ['JAX', 'BUF'], ['SEA', 'MIA'], ['LAC', 'PIT'], ['WAS', 'CIN'],
+    ['DAL', 'BAL'], ['MIN', 'HOU'], ['CAR', 'ATL'], ['PHI', 'NO'],
+    ['DEN', 'TB'], ['LAR', 'SF'], ['NYG', 'KC'], ['LV', 'CLE'],
+  ];
+
+  // Week 4
+  const week4: [string, string][] = [
+    ['NYG', 'DAL'], ['TB', 'PHI'], ['ARI', 'WAS'], ['GB', 'MIN'],
+    ['SEA', 'DET'], ['LAR', 'CHI'], ['NE', 'SF'], ['DEN', 'NYJ'],
+    ['BAL', 'BUF'], ['LAC', 'KC'], ['CAR', 'CIN'], ['LV', 'CLE'],
+    ['IND', 'PIT'], ['JAX', 'HOU'], ['TEN', 'MIA'], ['NO', 'ATL'],
+  ];
+
+  // Week 5
+  const week5: [string, string][] = [
+    ['CIN', 'BAL'], ['DAL', 'PIT'], ['WAS', 'CLE'], ['MIN', 'NYJ'],
+    ['MIA', 'NE'], ['HOU', 'BUF'], ['JAX', 'IND'], ['SEA', 'TEN'],
+    ['LV', 'DEN'], ['KC', 'LAC'], ['CHI', 'CAR'], ['PHI', 'DET'],
+    ['LAR', 'GB'], ['SF', 'ARI'], ['TB', 'ATL'], ['NYG', 'NO'],
+  ];
+
+  // Week 6
+  const week6: [string, string][] = [
+    ['CLE', 'PHI'], ['LV', 'PIT'], ['DET', 'DAL'], ['BAL', 'WAS'],
+    ['CIN', 'NYG'], ['HOU', 'NE'], ['JAX', 'CHI'], ['TEN', 'IND'],
+    ['SF', 'MIA'], ['NYJ', 'BUF'], ['CAR', 'ATL'], ['TB', 'NO'],
+    ['ARI', 'GB'], ['DEN', 'LAR'], ['SEA', 'MIN'], ['LAC', 'KC'],
+  ];
+
+  // Week 7
+  const week7: [string, string][] = [
+    ['KC', 'SF'], ['DET', 'HOU'], ['TB', 'BAL'], ['CLE', 'CIN'],
+    ['NYJ', 'PIT'], ['JAX', 'NE'], ['IND', 'MIA'], ['SEA', 'TEN'],
+    ['LV', 'DEN'], ['LAC', 'ARI'], ['CHI', 'CAR'], ['PHI', 'WAS'],
+    ['LAR', 'GB'], ['BUF', 'NYG'], ['ATL', 'NO'], ['DAL', 'MIN'],
+  ];
+
+  // Week 8
+  const week8: [string, string][] = [
+    ['MIA', 'ARI'], ['PHI', 'CIN'], ['CLE', 'BAL'], ['NE', 'NYJ'],
+    ['PIT', 'NYG'], ['SEA', 'BUF'], ['IND', 'HOU'], ['GB', 'JAX'],
+    ['DET', 'TEN'], ['WAS', 'CHI'], ['SF', 'DAL'], ['TB', 'ATL'],
+    ['LAC', 'NO'], ['LAR', 'MIN'], ['LV', 'KC'], ['CAR', 'DEN'],
+  ];
+
+  // Week 9
+  const week9: [string, string][] = [
+    ['HOU', 'NYJ'], ['TEN', 'NE'], ['MIA', 'BUF'], ['BAL', 'CIN'],
+    ['LAC', 'CLE'], ['WAS', 'PIT'], ['ATL', 'DAL'], ['JAX', 'PHI'],
+    ['CAR', 'NYG'], ['ARI', 'CHI'], ['GB', 'DET'], ['IND', 'MIN'],
+    ['TB', 'NO'], ['SF', 'LAR'], ['DEN', 'KC'], ['SEA', 'LV'],
+  ];
+
+  // Week 10
+  const week10: [string, string][] = [
+    ['PIT', 'WAS'], ['CIN', 'BAL'], ['NE', 'CLE'], ['ARI', 'NYJ'],
+    ['LAR', 'MIA'], ['IND', 'BUF'], ['DET', 'HOU'], ['MIN', 'JAX'],
+    ['KC', 'TEN'], ['CHI', 'GB'], ['PHI', 'DAL'], ['NO', 'ATL'],
+    ['CAR', 'NYG'], ['TB', 'SF'], ['LAC', 'SEA'], ['DEN', 'LV'],
+  ];
+
+  // Week 11
+  const week11: [string, string][] = [
+    ['WAS', 'PHI'], ['HOU', 'DAL'], ['CHI', 'NYG'], ['LAC', 'CIN'],
+    ['PIT', 'CLE'], ['BAL', 'IND'], ['KC', 'BUF'], ['LV', 'MIA'],
+    ['LAR', 'NE'], ['NYJ', 'TEN'], ['DET', 'JAX'], ['MIN', 'SEA'],
+    ['ARI', 'CAR'], ['ATL', 'DEN'], ['SF', 'TB'], ['GB', 'NO'],
+  ];
+
+  // Week 12
+  const week12: [string, string][] = [
+    ['CAR', 'KC'], ['DEN', 'LV'], ['BAL', 'LAC'], ['CLE', 'PIT'],
+    ['NYJ', 'CIN'], ['DAL', 'HOU'], ['DET', 'IND'], ['CHI', 'JAX'],
+    ['TEN', 'MIA'], ['NE', 'BUF'], ['SF', 'ATL'], ['NO', 'TB'],
+    ['NYG', 'PHI'], ['LAR', 'WAS'], ['MIN', 'GB'], ['ARI', 'SEA'],
+  ];
+
+  // Week 13
+  const week13: [string, string][] = [
+    ['ATL', 'LAC'], ['PHI', 'BAL'], ['PIT', 'CIN'], ['DEN', 'CLE'],
+    ['SEA', 'NYJ'], ['IND', 'NE'], ['GB', 'MIA'], ['SF', 'BUF'],
+    ['HOU', 'JAX'], ['LV', 'KC'], ['WAS', 'TEN'], ['DET', 'CHI'],
+    ['ARI', 'MIN'], ['LAR', 'NO'], ['CAR', 'TB'], ['NYG', 'DAL'],
+  ];
+
+  // Week 14
+  const week14: [string, string][] = [
+    ['CLE', 'PIT'], ['LAR', 'BAL'], ['DAL', 'CIN'], ['MIA', 'NYJ'],
+    ['BUF', 'NE'], ['TEN', 'HOU'], ['IND', 'JAX'], ['LAC', 'KC'],
+    ['DEN', 'LV'], ['WAS', 'CHI'], ['PHI', 'CAR'], ['ATL', 'MIN'],
+    ['NO', 'GB'], ['TB', 'DET'], ['SF', 'SEA'], ['ARI', 'NYG'],
+  ];
+
+  // Week 15
+  const week15: [string, string][] = [
+    ['KC', 'CLE'], ['TEN', 'CIN'], ['PHI', 'PIT'], ['NYG', 'BAL'],
+    ['JAX', 'NYJ'], ['ARI', 'NE'], ['DET', 'BUF'], ['HOU', 'MIA'],
+    ['DEN', 'IND'], ['CAR', 'DAL'], ['LV', 'ATL'], ['LAC', 'TB'],
+    ['MIN', 'CHI'], ['WAS', 'NO'], ['SEA', 'GB'], ['LAR', 'SF'],
+  ];
+
+  // Week 16
+  const week16: [string, string][] = [
+    ['KC', 'HOU'], ['CIN', 'DEN'], ['BAL', 'PIT'], ['NYJ', 'CLE'],
+    ['BUF', 'NE'], ['SF', 'MIA'], ['LV', 'JAX'], ['IND', 'TEN'],
+    ['TB', 'DAL'], ['WAS', 'PHI'], ['ATL', 'NYG'], ['ARI', 'CAR'],
+    ['DET', 'CHI'], ['GB', 'MIN'], ['LAR', 'NO'], ['SEA', 'LAC'],
+  ];
+
+  // Week 17
+  const week17: [string, string][] = [
+    ['PIT', 'KC'], ['HOU', 'BAL'], ['DEN', 'CIN'], ['LAC', 'CLE'],
+    ['BUF', 'NYJ'], ['LV', 'NE'], ['MIA', 'ARI'], ['NYG', 'IND'],
+    ['TEN', 'JAX'], ['PHI', 'DAL'], ['ATL', 'WAS'], ['CAR', 'TB'],
+    ['SEA', 'CHI'], ['SF', 'DET'], ['MIN', 'GB'], ['LAR', 'NO'],
+  ];
+
+  // Week 18 - Final week
+  const week18: [string, string][] = [
+    ['CIN', 'PIT'], ['CLE', 'BAL'], ['NE', 'BUF'], ['NYJ', 'MIA'],
+    ['TEN', 'HOU'], ['JAX', 'IND'], ['DEN', 'KC'], ['LV', 'LAC'],
+    ['WAS', 'DAL'], ['NYG', 'PHI'], ['MIN', 'DET'], ['CHI', 'GB'],
+    ['CAR', 'ATL'], ['NO', 'TB'], ['ARI', 'SF'], ['LAR', 'SEA'],
+  ];
+
+  const allWeeks: [string, string][][] = [
+    week1, week2, week3, week4, week5, week6, week7, week8, week9,
+    week10, week11, week12, week13, week14, week15, week16, week17, week18
+  ];
+
+  allWeeks.forEach((weekMatchups, weekIdx) => {
+    const weekNum = weekIdx + 1;
+    games[String(weekNum)] = weekMatchups.map((matchup, idx) => {
+      const [away, home] = matchup;
+      const homeRating = TEAM_RATINGS[home] || 0;
+      const awayRating = TEAM_RATINGS[away] || 0;
+      // Calculate win probability with home field advantage
+      const margin = homeRating - awayRating + 1.7;
+      const wp = 1 / (1 + Math.exp(-0.107 * margin));
+      
+      return {
+        id: gameId++,
+        week: weekNum,
+        away,
+        home,
+        pIndex: idx,
+        wp: Math.max(0.15, Math.min(0.85, wp)), // Clamp between 15% and 85%
+        done: false,
+        hs: 0,
+        as: 0,
+      };
+    });
+  });
 
   return games;
 }
